@@ -1,7 +1,6 @@
 package wu
 
 import (
-	"fmt"
 	"github.com/mattn/go-ole"
 	"github.com/mattn/go-ole/oleutil"
 )
@@ -17,15 +16,15 @@ func (ses *Session) NewSearcher(online bool) *Searcher {
 	return sea
 }
 
-func (sea *Searcher) Query(query string) {
-	fmt.Printf("Query: %s\n", query)
+func (sea *Searcher) Query(query string) *Updates {
 	queryResult := oleutil.MustCallMethod(sea.updateSearcher, "Search", query).ToIDispatch()
+	updatesSet := new(Updates)
 	updates := oleutil.MustGetProperty(queryResult, "Updates").ToIDispatch()
 	count := int(oleutil.MustGetProperty(updates, "Count").Val)
-	fmt.Printf("Query result count: %d\n", count)
+	updatesSet.Updates = make([]*Update, count)
 	for i := 0; i < count; i++ {
 		item := oleutil.MustGetProperty(updates, "Item", i).ToIDispatch()
-		title := oleutil.MustGetProperty(item, "Title").ToString()
-		fmt.Printf("[%d] %s\n", i, title)
+		updatesSet.Updates[i] = newUpdate(item)
 	}
+	return updatesSet
 }
