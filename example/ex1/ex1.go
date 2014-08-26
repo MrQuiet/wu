@@ -6,5 +6,7 @@ import (
 
 func main() {
 	ses := wu.NewSession()
-	_ = ses.NewSearcher(true)
+	sea := ses.NewSearcher(true)
+	sea.Query(wu.NewSearchQuery().IsInstalled(true).IsHidden(false).String())
+	sea.Query(wu.NewSearchQuery().IsInstalled(false).IsHidden(false).String())
 }
