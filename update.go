@@ -22,8 +22,11 @@ type Update struct {
 	IsUninstallable          bool
 	IsHidden                 bool
 	IsMandatory              bool
+	IsPresent                bool
 	RebootRequired           bool
 	EulaAccepted             bool
+	PerUser                  bool
+	BrowseOnly               bool
 	RevisionNumber           int
 	UpdateID                 string
 	SupportUrl               string
@@ -33,9 +36,16 @@ type Update struct {
 	SecurityBulletinIDs      []string
 	SupersededUpdateIDs      []string
 	KBArticleIDs             []string
+	CveIDs                   []string
 	MaxDownloadSize          int
 	MinDownloadSize          int
 	Categories               Categories
+	RecommendedCPUSpeed      int
+	RecommendedHardDiskSpace int
+	RecommendedMemory        int
+	Type                     UpdateType
+	AutoDownload             AutoDownload
+	AutoSelection            AutoSelection
 }
 
 func newUpdate(item *ole.IDispatch) *Update {
@@ -50,8 +60,11 @@ func newUpdate(item *ole.IDispatch) *Update {
 	up.IsUninstallable = up.GetBool("IsUninstallable")
 	up.IsHidden = up.GetBool("IsHidden")
 	up.IsMandatory = up.GetBool("IsMandatory")
+	up.IsPresent = up.GetBool("IsPresent")
 	up.RebootRequired = up.GetBool("RebootRequired")
 	up.EulaAccepted = up.GetBool("EulaAccepted")
+	up.PerUser = up.GetBool("PerUser")
+	up.BrowseOnly = up.GetBool("BrowseOnly")
 	{
 		identity := oleutil.MustGetProperty(item, "Identity").ToIDispatch()
 		revisionNumber := int(oleutil.MustGetProperty(identity, "RevisionNumber").Val)
@@ -90,6 +103,15 @@ func newUpdate(item *ole.IDispatch) *Update {
 			up.KBArticleIDs[i] = kbArticleID
 		}
 	}
+	{
+		cveIDs := oleutil.MustGetProperty(item, "CveIDs").ToIDispatch()
+		count := int(oleutil.MustGetProperty(cveIDs, "Count").Val)
+		up.CveIDs = make([]string, count)
+		for i := 0; i < count; i++ {
+			cveID := oleutil.MustGetProperty(cveIDs, "Item", i).ToString()
+			up.CveIDs[i] = cveID
+		}
+	}
 	up.MaxDownloadSize = up.GetInt("MaxDownloadSize")
 	up.MinDownloadSize = up.GetInt("MinDownloadSize")
 	{
@@ -102,6 +124,12 @@ func newUpdate(item *ole.IDispatch) *Update {
 			up.Categories.Categories[i] = newCategory(category)
 		}
 	}
+	up.RecommendedCPUSpeed = up.GetInt("RecommendedCPUSpeed")
+	up.RecommendedHardDiskSpace = up.GetInt("RecommendedHardDiskSpace")
+	up.RecommendedMemory = up.GetInt("RecommendedMemory")
+	up.Type = UpdateType(up.GetInt("Type"))
+	up.AutoDownload = AutoDownload(up.GetInt("AutoDownload"))
+	up.AutoSelection = AutoSelection(up.GetInt("AutoSelection"))
 	return up
 }
 
