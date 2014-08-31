@@ -3,7 +3,7 @@ package wu
 type UpdateType int
 
 const (
-	UPDATETYPE_SOFTWARE UpdateType = iota
+	UPDATETYPE_SOFTWARE UpdateType = iota + 1
 	UPDATETYPE_DRIVERS
 )
 
