@@ -158,7 +158,7 @@ func (up *Update) GetDateTime(attr string) time.Time {
 	if val == 0 {
 		return time.Time{}
 	}
-	t := time.Unix(val/10000000-11644473600, 0) // FIXME: This is supposed to be a Windows DateTime, but I'm not having a good time on this one.
+	t := time.Unix(val/10000000-11644473600, 0) // FIXME: I don't know how to interpret this value.
 	return t
 }
 
@@ -167,6 +167,6 @@ func (up *Update) GetDate(attr string) time.Time {
 	if val == 0 {
 		return time.Time{}
 	}
-	t := time.Unix(val/10000000-11644473600, 0) // FIXME: This is supposed to be a Windows Date, not an attempt at a DateTime.
+	t := time.Unix(val/10000000-11644473600, 0) // FIXME: I don't know how to interpret this value.
 	return t
 }
