@@ -13,4 +13,7 @@ func main() {
 	for _, update := range updates.Updates {
 		fmt.Printf("[%s] %s\n", update.Type, update.Title)
 	}
+	downloader := ses.NewDownloader(updates)
+	code, err := downloader.Download()
+	fmt.Printf("DOWNLOAD: [%s] [%s]\n", code, err)
 }

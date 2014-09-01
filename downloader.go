@@ -23,8 +23,8 @@ func (dow *Downloader) IsBusy() bool {
 }
 
 // FIXME: return value is probably going to be set to something useful
-func (dow *Downloader) Download() (code int64, err error) {
+func (dow *Downloader) Download() (WUError, error) {
 	ret, err := oleutil.CallMethod(dow.updateDownloader, "Download")
-	val := ret.Val
+	val := WUError(ret.Val)
 	return val, err
 }
