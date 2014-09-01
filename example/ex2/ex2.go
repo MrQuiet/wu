@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gopkg.in/wu.v0"
+	"os"
 )
 
 func main() {
@@ -17,7 +18,19 @@ func main() {
 			fmt.Printf("ACCEPTEULA: [%s] [%s]\n", code, err)
 		}
 	}
-	downloader := ses.NewDownloader(updates)
-	code, err := downloader.Download()
-	fmt.Printf("DOWNLOAD: [%s] [%s]\n", code, err)
+	{
+		code, err := ses.NewDownloader(updates).Download()
+		if err != nil {
+			fmt.Printf("DOWNLOAD: [%s] [%s]\n", code, err)
+			os.Exit(1)
+		}
+	}
+	{
+		code, err := ses.NewInstaller(updates).Install()
+		if err != nil {
+			fmt.Printf("INSTALL: [%s] [%s]\n", code, err)
+			os.Exit(1)
+		}
+	}
+	fmt.Println("Done.")
 }
