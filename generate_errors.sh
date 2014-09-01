@@ -2,28 +2,71 @@
 
 FILENAME=errors.go
 
-echo "package wu" > "$FILENAME"
+cat "$FILENAME.head" > "$FILENAME"
+
 echo "" >> "$FILENAME"
+
 echo "const (" >> "$FILENAME"
 while read line; do
 	if [[ $line == WU_* ]]; then
 		VARNAME=$line
 		CODE=""
-		DESC=""
 	elif [[ $line == 0x* ]]; then
 		CODE=$line
-		DESC=""
-	else
-		DESC=$line
 	fi
-	if [[ ! -z $VARNAME ]] && [[ ! -z $CODE ]] && [[ ! -z $DESC ]]; then
-		echo -e "\t${VARNAME}      = $CODE" >> "$FILENAME"
-		echo -e "\t${VARNAME}_DESC = \"$DESC\"" >> "$FILENAME"
+	if [[ ! -z $VARNAME ]] && [[ ! -z $CODE ]]; then
+		echo -e "\t$VARNAME WUError = $CODE" >> "$FILENAME"
+		VARNAME=""
+		CODE=""
 	fi
 done < errors.txt
 echo ")" >> "$FILENAME"
 
+echo "" >> "$FILENAME"
 
+echo "func ErrorDesc(errCode WUError) string {" >> "$FILENAME"
+echo -e "\tswitch errCode {" >> "$FILENAME"
+while read line; do
+	if [[ $line == WU_* ]]; then
+		VARNAME=$line
+		DESC=""
+	elif [[ $line == 0x* ]]; then
+		DESC=""
+	else
+		DESC=$line
+	fi
+	if [[ ! -z $VARNAME ]] && [[ ! -z $DESC ]]; then
+		echo -e "\tcase $VARNAME:" >> "$FILENAME"
+		echo -e "\t\treturn \`$DESC\`" >> "$FILENAME"
+		VARNAME=""
+		DESC=""
+	fi
+done < errors.txt
+echo -e "\tdefault: return \`Unknown error.\`" >> "$FILENAME"
+echo -e "\t}" >> "$FILENAME"
+echo "}" >> "$FILENAME"
+
+echo "" >> "$FILENAME"
+
+echo "func ErrorName(errCode WUError) string {" >> "$FILENAME"
+echo -e "\tswitch errCode {" >> "$FILENAME"
+while read line; do
+	if [[ $line == WU_* ]]; then
+		VARNAME=$line
+	fi
+	if [[ ! -z $VARNAME ]]; then
+		echo -e "\tcase $VARNAME:" >> "$FILENAME"
+		echo -e "\t\treturn \`$VARNAME\`" >> "$FILENAME"
+		VARNAME=""
+	fi
+done < errors.txt
+echo -e "\tdefault: return \`\`" >> "$FILENAME"
+echo -e "\t}" >> "$FILENAME"
+echo "}" >> "$FILENAME"
+
+echo "" >> "$FILENAME"
+
+cat "$FILENAME.tail" >> "$FILENAME"
 
 echo "" >> "$FILENAME"
 echo "// REFERENCES:" >> "$FILENAME"

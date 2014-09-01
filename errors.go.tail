@@ -1,0 +1,3 @@
+func (wue WUError) String() string {
+	return "[" + ErrorName(wue) + "] " + ErrorDesc(wue)
+}

@@ -1,0 +1,3 @@
+package wu
+
+type WUError int64

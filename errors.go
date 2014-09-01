@@ -1,193 +1,492 @@
 package wu
 
+type WUError int64
+
 const (
-	WU_S_SERVICE_STOP                          = 0x00240001
-	WU_S_SERVICE_STOP_DESC                     = "WUA was stopped successfully."
-	WU_S_SELFUPDATE                            = 0x00240002
-	WU_S_SELFUPDATE_DESC                       = "WUA updated itself."
-	WU_S_UPDATE_ERROR                          = 0x00240003
-	WU_S_UPDATE_ERROR_DESC                     = "The operation completed successfully but errors occurred applying the updates."
-	WU_S_MARKED_FOR_DISCONNECT                 = 0x00240004
-	WU_S_MARKED_FOR_DISCONNECT_DESC            = "A callback was marked to be disconnected later because the request to disconnect the operation came while a callback was executing."
-	WU_S_REBOOT_REQUIRED                       = 0x00240005
-	WU_S_REBOOT_REQUIRED_DESC                  = "The system must be restarted to complete installation of the update."
-	WU_S_ALREADY_INSTALLED                     = 0x00240006
-	WU_S_ALREADY_INSTALLED_DESC                = "The update to be installed is already installed on the system."
-	WU_S_ALREADY_UNINSTALLED                   = 0x00240007
-	WU_S_ALREADY_UNINSTALLED_DESC              = "The update to be removed is not installed on the system."
-	WU_S_ALREADY_DOWNLOADED                    = 0x00240008
-	WU_S_ALREADY_DOWNLOADED_DESC               = "The update to be downloaded has already been downloaded."
-	WU_S_UH_INSTALLSTILLPENDING                = 0x00242015
-	WU_S_UH_INSTALLSTILLPENDING_DESC           = "The installation operation for the update is still in progress."
-	WU_E_NO_SERVICE                            = 0x80240001
-	WU_E_NO_SERVICE_DESC                       = "WUA was unable to provide the service."
-	WU_E_MAX_CAPACITY_REACHED                  = 0x80240002
-	WU_E_MAX_CAPACITY_REACHED_DESC             = "The maximum capacity of the service was exceeded."
-	WU_E_UNKNOWN_ID                            = 0x80240003
-	WU_E_UNKNOWN_ID_DESC                       = "WUA cannot find an ID."
-	WU_E_NOT_INITIALIZED                       = 0x80240004
-	WU_E_NOT_INITIALIZED_DESC                  = "The object could not be initialized."
-	WU_E_RANGEOVERLAP                          = 0x80240005
-	WU_E_RANGEOVERLAP_DESC                     = "The update handler requested a byte range overlapping a previously requested range."
-	WU_E_TOOMANYRANGES                         = 0x80240006
-	WU_E_TOOMANYRANGES_DESC                    = "The requested number of byte ranges exceeds the maximum number (231 - 1)."
-	WU_E_INVALIDINDEX                          = 0x80240007
-	WU_E_INVALIDINDEX_DESC                     = "The index to a collection was invalid."
-	WU_E_ITEMNOTFOUND                          = 0x80240008
-	WU_E_ITEMNOTFOUND_DESC                     = "The key for the item queried could not be found."
-	WU_E_OPERATIONINPROGRESS                   = 0x80240009
-	WU_E_OPERATIONINPROGRESS_DESC              = "Another conflicting operation was in progress. Some operations such as installation cannot be performed twice simultaneously."
-	WU_E_COULDNOTCANCEL                        = 0x8024000A
-	WU_E_COULDNOTCANCEL_DESC                   = "Cancellation of the operation was not allowed."
-	WU_E_CALL_CANCELLED                        = 0x8024000B
-	WU_E_CALL_CANCELLED_DESC                   = "Operation was cancelled."
-	WU_E_NOOP                                  = 0x8024000C
-	WU_E_NOOP_DESC                             = "No operation was required."
-	WU_E_XML_MISSINGDATA                       = 0x8024000D
-	WU_E_XML_MISSINGDATA_DESC                  = "WUA could not find required information in the update's XML data."
-	WU_E_XML_INVALID                           = 0x8024000E
-	WU_E_XML_INVALID_DESC                      = "WUA found invalid information in the update's XML data."
-	WU_E_CYCLE_DETECTED                        = 0x8024000F
-	WU_E_CYCLE_DETECTED_DESC                   = "Circular update relationships were detected in the metadata."
-	WU_E_TOO_DEEP_RELATION                     = 0x80240010
-	WU_E_TOO_DEEP_RELATION_DESC                = "Update relationships too deep to evaluate were evaluated."
-	WU_E_INVALID_RELATIONSHIP                  = 0x80240011
-	WU_E_INVALID_RELATIONSHIP_DESC             = "An invalid update relationship was detected."
-	WU_E_REG_VALUE_INVALID                     = 0x80240012
-	WU_E_REG_VALUE_INVALID_DESC                = "An invalid registry value was read."
-	WU_E_DUPLICATE_ITEM                        = 0x80240013
-	WU_E_DUPLICATE_ITEM_DESC                   = "Operation tried to add a duplicate item to a list."
-	WU_E_INVALID_INSTALL_REQUESTED             = 0x80240014
-	WU_E_INVALID_INSTALL_REQUESTED_DESC        = "Updates that are requested for install are not installable by the caller."
-	WU_E_INSTALL_NOT_ALLOWED                   = 0x80240016
-	WU_E_INSTALL_NOT_ALLOWED_DESC              = "Operation tried to install while another installation was in progress or the system was pending a mandatory restart."
-	WU_E_NOT_APPLICABLE                        = 0x80240017
-	WU_E_NOT_APPLICABLE_DESC                   = "Operation was not performed because there are no applicable updates."
-	WU_E_NO_USERTOKEN                          = 0x80240018
-	WU_E_NO_USERTOKEN_DESC                     = "Operation failed because a required user token is missing."
-	WU_E_EXCLUSIVE_INSTALL_CONFLICT            = 0x80240019
-	WU_E_EXCLUSIVE_INSTALL_CONFLICT_DESC       = "An exclusive update can't be installed with other updates at the same time."
-	WU_E_POLICY_NOT_SET                        = 0x8024001A
-	WU_E_POLICY_NOT_SET_DESC                   = "A policy value was not set."
-	WU_E_SELFUPDATE_IN_PROGRESS                = 0x8024001B
-	WU_E_SELFUPDATE_IN_PROGRESS_DESC           = "The operation could not be performed because the Windows Update Agent is self-updating."
-	WU_E_INVALID_UPDATE                        = 0x8024001D
-	WU_E_INVALID_UPDATE_DESC                   = "An update contains invalid metadata."
-	WU_E_SERVICE_STOP                          = 0x8024001E
-	WU_E_SERVICE_STOP_DESC                     = "Operation did not complete because the service or system was being shut down."
-	WU_E_NO_CONNECTION                         = 0x8024001F
-	WU_E_NO_CONNECTION_DESC                    = "Operation did not complete because the network connection was unavailable."
-	WU_E_NO_INTERACTIVE_USER                   = 0x80240020
-	WU_E_NO_INTERACTIVE_USER_DESC              = "Operation did not complete because there is no logged-on interactive user."
-	WU_E_TIME_OUT                              = 0x80240021
-	WU_E_TIME_OUT_DESC                         = "Operation did not complete because it timed out."
-	WU_E_ALL_UPDATES_FAILED                    = 0x80240022
-	WU_E_ALL_UPDATES_FAILED_DESC               = "Operation failed for all the updates."
-	WU_E_EULAS_DECLINED                        = 0x80240023
-	WU_E_EULAS_DECLINED_DESC                   = "The license terms for all updates were declined."
-	WU_E_NO_UPDATE                             = 0x80240024
-	WU_E_NO_UPDATE_DESC                        = "There are no updates."
-	WU_E_USER_ACCESS_DISABLED                  = 0x80240025
-	WU_E_USER_ACCESS_DISABLED_DESC             = "Group Policy settings prevented access to Windows Update."
-	WU_E_INVALID_UPDATE_TYPE                   = 0x80240026
-	WU_E_INVALID_UPDATE_TYPE_DESC              = "The type of update is invalid."
-	WU_E_URL_TOO_LONG                          = 0x80240027
-	WU_E_URL_TOO_LONG_DESC                     = "The URL exceeded the maximum length."
-	WU_E_UNINSTALL_NOT_ALLOWED                 = 0x80240028
-	WU_E_UNINSTALL_NOT_ALLOWED_DESC            = "The update could not be uninstalled because the request did not originate from a Windows Server Update Services (WSUS) server."
-	WU_E_INVALID_PRODUCT_LICENSE               = 0x80240029
-	WU_E_INVALID_PRODUCT_LICENSE_DESC          = "Search may have missed some updates before there is an unlicensed application on the system."
-	WU_E_MISSING_HANDLER                       = 0x8024002A
-	WU_E_MISSING_HANDLER_DESC                  = "A component required to detect applicable updates was missing."
-	WU_E_LEGACYSERVER                          = 0x8024002B
-	WU_E_LEGACYSERVER_DESC                     = "An operation did not complete because it requires a newer version of server."
-	WU_E_BIN_SOURCE_ABSENT                     = 0x8024002C
-	WU_E_BIN_SOURCE_ABSENT_DESC                = "A delta-compressed update could not be installed because it required the source."
-	WU_E_SOURCE_ABSENT                         = 0x8024002D
-	WU_E_SOURCE_ABSENT_DESC                    = "A full-file update could not be installed because it required the source."
-	WU_E_WU_DISABLED                           = 0x8024002E
-	WU_E_WU_DISABLED_DESC                      = "Access to an unmanaged server is not allowed."
-	WU_E_CALL_CANCELLED_BY_POLICY              = 0x8024002F
-	WU_E_CALL_CANCELLED_BY_POLICY_DESC         = "Operation did not complete because the DisableWindowsUpdateAccess policy was set in the registry."
-	WU_E_INVALID_PROXY_SERVER                  = 0x80240030
-	WU_E_INVALID_PROXY_SERVER_DESC             = "The format of the proxy list was invalid."
-	WU_E_INVALID_FILE                          = 0x80240031
-	WU_E_INVALID_FILE_DESC                     = "The file is in the wrong format."
-	WU_E_INVALID_CRITERIA                      = 0x80240032
-	WU_E_INVALID_CRITERIA_DESC                 = "The search criteria string was invalid."
-	WU_E_EULA_UNAVAILABLE                      = 0x80240033
-	WU_E_EULA_UNAVAILABLE_DESC                 = "License terms could not be downloaded."
-	WU_E_DOWNLOAD_FAILED                       = 0x80240034
-	WU_E_DOWNLOAD_FAILED_DESC                  = "Update failed to download."
-	WU_E_UPDATE_NOT_PROCESSED                  = 0x80240035
-	WU_E_UPDATE_NOT_PROCESSED_DESC             = "The update was not processed."
-	WU_E_INVALID_OPERATION                     = 0x80240036
-	WU_E_INVALID_OPERATION_DESC                = "The object's current state did not allow the operation."
-	WU_E_NOT_SUPPORTED                         = 0x80240037
-	WU_E_NOT_SUPPORTED_DESC                    = "The functionality for the operation is not supported."
-	WU_E_TOO_MANY_RESYNC                       = 0x80240039
-	WU_E_TOO_MANY_RESYNC_DESC                  = "Agent is asked by server to resync too many times."
-	WU_E_NO_SERVER_CORE_SUPPORT                = 0x80240040
-	WU_E_NO_SERVER_CORE_SUPPORT_DESC           = "The WUA API method does not run on the server core installation."
-	WU_E_SYSPREP_IN_PROGRESS                   = 0x80240041
-	WU_E_SYSPREP_IN_PROGRESS_DESC              = "Service is not available while sysprep is running."
-	WU_E_UNKNOWN_SERVICE                       = 0x80240042
-	WU_E_UNKNOWN_SERVICE_DESC                  = "The update service is no longer registered with automatic updates."
-	WU_E_NO_UI_SUPPORT                         = 0x80240043
-	WU_E_NO_UI_SUPPORT_DESC                    = "No support for the WUA user interface."
-	WU_E_PER_MACHINE_UPDATE_ACCESS_DENIED      = 0x80240044
-	WU_E_PER_MACHINE_UPDATE_ACCESS_DENIED_DESC = "Only administrators can perform this operation on per-computer updates."
-	WU_E_UNSUPPORTED_SEARCHSCOPE               = 0x80240045
-	WU_E_UNSUPPORTED_SEARCHSCOPE_DESC          = "A search was attempted with a scope that is not currently supported for this type of search."
-	WU_E_BAD_FILE_URL                          = 0x80240046
-	WU_E_BAD_FILE_URL_DESC                     = "The URL does not point to a file."
-	WU_E_NOTSUPPORTED                          = 0x80240047
-	WU_E_NOTSUPPORTED_DESC                     = "The operation requested is not supported."
-	WU_E_INVALID_NOTIFICATION_INFO             = 0x80240048
-	WU_E_INVALID_NOTIFICATION_INFO_DESC        = "The featured update notification info returned by the server is invalid."
-	WU_E_OUTOFRANGE                            = 0x80240049
-	WU_E_OUTOFRANGE_DESC                       = "The data is out of range."
-	WU_E_SETUP_IN_PROGRESS                     = 0x8024004A
-	WU_E_SETUP_IN_PROGRESS_DESC                = "WUA operations are not available while operating system setup is running."
-	WU_E_UNEXPECTED                            = 0x80240FFF
-	WU_E_UNEXPECTED_DESC                       = "An operation failed due to reasons not covered by another error code."
-	WU_E_WINHTTP_INVALID_FILE                  = 0x80240038
-	WU_E_WINHTTP_INVALID_FILE_DESC             = "The downloaded file has an unexpected content type."
-	WU_E_PT_HTTP_STATUS_BAD_REQUEST            = 0x80244016
-	WU_E_PT_HTTP_STATUS_BAD_REQUEST_DESC       = "Same as HTTP status 400 – The server could not process the request due to invalid syntax."
-	WU_E_PT_HTTP_STATUS_DENIED                 = 0x80244017
-	WU_E_PT_HTTP_STATUS_DENIED_DESC            = "Same as HTTP status 401 – The requested resource requires user authentication."
-	WU_E_PT_HTTP_STATUS_FORBIDDEN              = 0x80244018
-	WU_E_PT_HTTP_STATUS_FORBIDDEN_DESC         = "Same as HTTP status 403 – Server understood the request, but declines to fulfill it."
-	WU_E_PT_HTTP_STATUS_NOT_FOUND              = 0x80244019
-	WU_E_PT_HTTP_STATUS_NOT_FOUND_DESC         = "Same as HTTP status 404 – The server cannot find the requested URI (Uniform Resource Identifier)."
-	WU_E_PT_HTTP_STATUS_BAD_METHOD             = 0x8024401A
-	WU_E_PT_HTTP_STATUS_BAD_METHOD_DESC        = "Same as HTTP status 405 – The HTTP method is not allowed."
-	WU_E_PT_HTTP_STATUS_PROXY_AUTH_REQ         = 0x8024401B
-	WU_E_PT_HTTP_STATUS_PROXY_AUTH_REQ_DESC    = "Same as HTTP status 407 – Proxy authentication is required."
-	WU_E_PT_HTTP_STATUS_REQUEST_TIMEOUT        = 0x8024401C
-	WU_E_PT_HTTP_STATUS_REQUEST_TIMEOUT_DESC   = "Same as HTTP status 408 – The server timed out waiting for the request."
-	WU_E_PT_HTTP_STATUS_CONFLICT               = 0x8024401D
-	WU_E_PT_HTTP_STATUS_CONFLICT_DESC          = "Same as HTTP status 409 – The request was not completed due to a conflict with the current state of the resource."
-	WU_E_PT_HTTP_STATUS_GONE                   = 0x8024401E
-	WU_E_PT_HTTP_STATUS_GONE_DESC              = "Same as HTTP status 410 – Requested resource is no longer available at the server."
-	WU_E_PT_HTTP_STATUS_SERVER_ERROR           = 0x8024401F
-	WU_E_PT_HTTP_STATUS_SERVER_ERROR_DESC      = "Same as HTTP status 500 – An error internal to the server prevented fulfilling the request."
-	WU_E_PT_HTTP_STATUS_NOT_SUPPORTED          = 0x80244020
-	WU_E_PT_HTTP_STATUS_NOT_SUPPORTED_DESC     = "Same as HTTP status 501 – Server does not support the functionality required to fulfill the request."
-	WU_E_PT_HTTP_STATUS_BAD_GATEWAY            = 0x80244021
-	WU_E_PT_HTTP_STATUS_BAD_GATEWAY_DESC       = "Same as HTTP status 502 – The server, while acting as a gateway or proxy, received an invalid response from the upstream server it accessed in attempting to fulfill the request."
-	WU_E_PT_HTTP_STATUS_SERVICE_UNAVAIL        = 0x80244022
-	WU_E_PT_HTTP_STATUS_SERVICE_UNAVAIL_DESC   = "Same as HTTP status 503 – The service is temporarily overloaded."
-	WU_E_PT_HTTP_STATUS_GATEWAY_TIMEOUT        = 0x80244023
-	WU_E_PT_HTTP_STATUS_GATEWAY_TIMEOUT_DESC   = "Same as HTTP status 504 – The request was timed out waiting for a gateway."
-	WU_E_PT_HTTP_STATUS_VERSION_NOT_SUP        = 0x80244024
-	WU_E_PT_HTTP_STATUS_VERSION_NOT_SUP_DESC   = "Same as HTTP status 505 – The server does not support the HTTP protocol version used for the request."
-	WU_E_PT_HTTP_STATUS_NOT_MAPPED             = 0x8024402B
-	WU_E_PT_HTTP_STATUS_NOT_MAPPED_DESC        = "The request could not be completed and the reason did not correspond to any of the WU_E_PT_HTTP_* error codes."
-	WU_E_PT_WINHTTP_NAME_NOT_RESOLVED          = 0x8024402C
-	WU_E_PT_WINHTTP_NAME_NOT_RESOLVED_DESC     = "Same as ERROR_WINHTTP_NAME_NOT_RESOLVED - The proxy server or target server name cannot be resolved."
+	WU_S_SERVICE_STOP                     WUError = 0x00240001
+	WU_S_SELFUPDATE                       WUError = 0x00240002
+	WU_S_UPDATE_ERROR                     WUError = 0x00240003
+	WU_S_MARKED_FOR_DISCONNECT            WUError = 0x00240004
+	WU_S_REBOOT_REQUIRED                  WUError = 0x00240005
+	WU_S_ALREADY_INSTALLED                WUError = 0x00240006
+	WU_S_ALREADY_UNINSTALLED              WUError = 0x00240007
+	WU_S_ALREADY_DOWNLOADED               WUError = 0x00240008
+	WU_S_UH_INSTALLSTILLPENDING           WUError = 0x00242015
+	WU_E_NO_SERVICE                       WUError = 0x80240001
+	WU_E_MAX_CAPACITY_REACHED             WUError = 0x80240002
+	WU_E_UNKNOWN_ID                       WUError = 0x80240003
+	WU_E_NOT_INITIALIZED                  WUError = 0x80240004
+	WU_E_RANGEOVERLAP                     WUError = 0x80240005
+	WU_E_TOOMANYRANGES                    WUError = 0x80240006
+	WU_E_INVALIDINDEX                     WUError = 0x80240007
+	WU_E_ITEMNOTFOUND                     WUError = 0x80240008
+	WU_E_OPERATIONINPROGRESS              WUError = 0x80240009
+	WU_E_COULDNOTCANCEL                   WUError = 0x8024000A
+	WU_E_CALL_CANCELLED                   WUError = 0x8024000B
+	WU_E_NOOP                             WUError = 0x8024000C
+	WU_E_XML_MISSINGDATA                  WUError = 0x8024000D
+	WU_E_XML_INVALID                      WUError = 0x8024000E
+	WU_E_CYCLE_DETECTED                   WUError = 0x8024000F
+	WU_E_TOO_DEEP_RELATION                WUError = 0x80240010
+	WU_E_INVALID_RELATIONSHIP             WUError = 0x80240011
+	WU_E_REG_VALUE_INVALID                WUError = 0x80240012
+	WU_E_DUPLICATE_ITEM                   WUError = 0x80240013
+	WU_E_INVALID_INSTALL_REQUESTED        WUError = 0x80240014
+	WU_E_INSTALL_NOT_ALLOWED              WUError = 0x80240016
+	WU_E_NOT_APPLICABLE                   WUError = 0x80240017
+	WU_E_NO_USERTOKEN                     WUError = 0x80240018
+	WU_E_EXCLUSIVE_INSTALL_CONFLICT       WUError = 0x80240019
+	WU_E_POLICY_NOT_SET                   WUError = 0x8024001A
+	WU_E_SELFUPDATE_IN_PROGRESS           WUError = 0x8024001B
+	WU_E_INVALID_UPDATE                   WUError = 0x8024001D
+	WU_E_SERVICE_STOP                     WUError = 0x8024001E
+	WU_E_NO_CONNECTION                    WUError = 0x8024001F
+	WU_E_NO_INTERACTIVE_USER              WUError = 0x80240020
+	WU_E_TIME_OUT                         WUError = 0x80240021
+	WU_E_ALL_UPDATES_FAILED               WUError = 0x80240022
+	WU_E_EULAS_DECLINED                   WUError = 0x80240023
+	WU_E_NO_UPDATE                        WUError = 0x80240024
+	WU_E_USER_ACCESS_DISABLED             WUError = 0x80240025
+	WU_E_INVALID_UPDATE_TYPE              WUError = 0x80240026
+	WU_E_URL_TOO_LONG                     WUError = 0x80240027
+	WU_E_UNINSTALL_NOT_ALLOWED            WUError = 0x80240028
+	WU_E_INVALID_PRODUCT_LICENSE          WUError = 0x80240029
+	WU_E_MISSING_HANDLER                  WUError = 0x8024002A
+	WU_E_LEGACYSERVER                     WUError = 0x8024002B
+	WU_E_BIN_SOURCE_ABSENT                WUError = 0x8024002C
+	WU_E_SOURCE_ABSENT                    WUError = 0x8024002D
+	WU_E_WU_DISABLED                      WUError = 0x8024002E
+	WU_E_CALL_CANCELLED_BY_POLICY         WUError = 0x8024002F
+	WU_E_INVALID_PROXY_SERVER             WUError = 0x80240030
+	WU_E_INVALID_FILE                     WUError = 0x80240031
+	WU_E_INVALID_CRITERIA                 WUError = 0x80240032
+	WU_E_EULA_UNAVAILABLE                 WUError = 0x80240033
+	WU_E_DOWNLOAD_FAILED                  WUError = 0x80240034
+	WU_E_UPDATE_NOT_PROCESSED             WUError = 0x80240035
+	WU_E_INVALID_OPERATION                WUError = 0x80240036
+	WU_E_NOT_SUPPORTED                    WUError = 0x80240037
+	WU_E_TOO_MANY_RESYNC                  WUError = 0x80240039
+	WU_E_NO_SERVER_CORE_SUPPORT           WUError = 0x80240040
+	WU_E_SYSPREP_IN_PROGRESS              WUError = 0x80240041
+	WU_E_UNKNOWN_SERVICE                  WUError = 0x80240042
+	WU_E_NO_UI_SUPPORT                    WUError = 0x80240043
+	WU_E_PER_MACHINE_UPDATE_ACCESS_DENIED WUError = 0x80240044
+	WU_E_UNSUPPORTED_SEARCHSCOPE          WUError = 0x80240045
+	WU_E_BAD_FILE_URL                     WUError = 0x80240046
+	WU_E_NOTSUPPORTED                     WUError = 0x80240047
+	WU_E_INVALID_NOTIFICATION_INFO        WUError = 0x80240048
+	WU_E_OUTOFRANGE                       WUError = 0x80240049
+	WU_E_SETUP_IN_PROGRESS                WUError = 0x8024004A
+	WU_E_UNEXPECTED                       WUError = 0x80240FFF
+	WU_E_WINHTTP_INVALID_FILE             WUError = 0x80240038
+	WU_E_PT_HTTP_STATUS_BAD_REQUEST       WUError = 0x80244016
+	WU_E_PT_HTTP_STATUS_DENIED            WUError = 0x80244017
+	WU_E_PT_HTTP_STATUS_FORBIDDEN         WUError = 0x80244018
+	WU_E_PT_HTTP_STATUS_NOT_FOUND         WUError = 0x80244019
+	WU_E_PT_HTTP_STATUS_BAD_METHOD        WUError = 0x8024401A
+	WU_E_PT_HTTP_STATUS_PROXY_AUTH_REQ    WUError = 0x8024401B
+	WU_E_PT_HTTP_STATUS_REQUEST_TIMEOUT   WUError = 0x8024401C
+	WU_E_PT_HTTP_STATUS_CONFLICT          WUError = 0x8024401D
+	WU_E_PT_HTTP_STATUS_GONE              WUError = 0x8024401E
+	WU_E_PT_HTTP_STATUS_SERVER_ERROR      WUError = 0x8024401F
+	WU_E_PT_HTTP_STATUS_NOT_SUPPORTED     WUError = 0x80244020
+	WU_E_PT_HTTP_STATUS_BAD_GATEWAY       WUError = 0x80244021
+	WU_E_PT_HTTP_STATUS_SERVICE_UNAVAIL   WUError = 0x80244022
+	WU_E_PT_HTTP_STATUS_GATEWAY_TIMEOUT   WUError = 0x80244023
+	WU_E_PT_HTTP_STATUS_VERSION_NOT_SUP   WUError = 0x80244024
+	WU_E_PT_HTTP_STATUS_NOT_MAPPED        WUError = 0x8024402B
+	WU_E_PT_WINHTTP_NAME_NOT_RESOLVED     WUError = 0x8024402C
 )
+
+func ErrorDesc(errCode WUError) string {
+	switch errCode {
+	case WU_S_SERVICE_STOP:
+		return `WUA was stopped successfully.`
+	case WU_S_SELFUPDATE:
+		return `WUA updated itself.`
+	case WU_S_UPDATE_ERROR:
+		return `The operation completed successfully but errors occurred applying the updates.`
+	case WU_S_MARKED_FOR_DISCONNECT:
+		return `A callback was marked to be disconnected later because the request to disconnect the operation came while a callback was executing.`
+	case WU_S_REBOOT_REQUIRED:
+		return `The system must be restarted to complete installation of the update.`
+	case WU_S_ALREADY_INSTALLED:
+		return `The update to be installed is already installed on the system.`
+	case WU_S_ALREADY_UNINSTALLED:
+		return `The update to be removed is not installed on the system.`
+	case WU_S_ALREADY_DOWNLOADED:
+		return `The update to be downloaded has already been downloaded.`
+	case WU_S_UH_INSTALLSTILLPENDING:
+		return `The installation operation for the update is still in progress.`
+	case WU_E_NO_SERVICE:
+		return `WUA was unable to provide the service.`
+	case WU_E_MAX_CAPACITY_REACHED:
+		return `The maximum capacity of the service was exceeded.`
+	case WU_E_UNKNOWN_ID:
+		return `WUA cannot find an ID.`
+	case WU_E_NOT_INITIALIZED:
+		return `The object could not be initialized.`
+	case WU_E_RANGEOVERLAP:
+		return `The update handler requested a byte range overlapping a previously requested range.`
+	case WU_E_TOOMANYRANGES:
+		return `The requested number of byte ranges exceeds the maximum number (231 - 1).`
+	case WU_E_INVALIDINDEX:
+		return `The index to a collection was invalid.`
+	case WU_E_ITEMNOTFOUND:
+		return `The key for the item queried could not be found.`
+	case WU_E_OPERATIONINPROGRESS:
+		return `Another conflicting operation was in progress. Some operations such as installation cannot be performed twice simultaneously.`
+	case WU_E_COULDNOTCANCEL:
+		return `Cancellation of the operation was not allowed.`
+	case WU_E_CALL_CANCELLED:
+		return `Operation was cancelled.`
+	case WU_E_NOOP:
+		return `No operation was required.`
+	case WU_E_XML_MISSINGDATA:
+		return `WUA could not find required information in the update's XML data.`
+	case WU_E_XML_INVALID:
+		return `WUA found invalid information in the update's XML data.`
+	case WU_E_CYCLE_DETECTED:
+		return `Circular update relationships were detected in the metadata.`
+	case WU_E_TOO_DEEP_RELATION:
+		return `Update relationships too deep to evaluate were evaluated.`
+	case WU_E_INVALID_RELATIONSHIP:
+		return `An invalid update relationship was detected.`
+	case WU_E_REG_VALUE_INVALID:
+		return `An invalid registry value was read.`
+	case WU_E_DUPLICATE_ITEM:
+		return `Operation tried to add a duplicate item to a list.`
+	case WU_E_INVALID_INSTALL_REQUESTED:
+		return `Updates that are requested for install are not installable by the caller.`
+	case WU_E_INSTALL_NOT_ALLOWED:
+		return `Operation tried to install while another installation was in progress or the system was pending a mandatory restart.`
+	case WU_E_NOT_APPLICABLE:
+		return `Operation was not performed because there are no applicable updates.`
+	case WU_E_NO_USERTOKEN:
+		return `Operation failed because a required user token is missing.`
+	case WU_E_EXCLUSIVE_INSTALL_CONFLICT:
+		return `An exclusive update can't be installed with other updates at the same time.`
+	case WU_E_POLICY_NOT_SET:
+		return `A policy value was not set.`
+	case WU_E_SELFUPDATE_IN_PROGRESS:
+		return `The operation could not be performed because the Windows Update Agent is self-updating.`
+	case WU_E_INVALID_UPDATE:
+		return `An update contains invalid metadata.`
+	case WU_E_SERVICE_STOP:
+		return `Operation did not complete because the service or system was being shut down.`
+	case WU_E_NO_CONNECTION:
+		return `Operation did not complete because the network connection was unavailable.`
+	case WU_E_NO_INTERACTIVE_USER:
+		return `Operation did not complete because there is no logged-on interactive user.`
+	case WU_E_TIME_OUT:
+		return `Operation did not complete because it timed out.`
+	case WU_E_ALL_UPDATES_FAILED:
+		return `Operation failed for all the updates.`
+	case WU_E_EULAS_DECLINED:
+		return `The license terms for all updates were declined.`
+	case WU_E_NO_UPDATE:
+		return `There are no updates.`
+	case WU_E_USER_ACCESS_DISABLED:
+		return `Group Policy settings prevented access to Windows Update.`
+	case WU_E_INVALID_UPDATE_TYPE:
+		return `The type of update is invalid.`
+	case WU_E_URL_TOO_LONG:
+		return `The URL exceeded the maximum length.`
+	case WU_E_UNINSTALL_NOT_ALLOWED:
+		return `The update could not be uninstalled because the request did not originate from a Windows Server Update Services (WSUS) server.`
+	case WU_E_INVALID_PRODUCT_LICENSE:
+		return `Search may have missed some updates before there is an unlicensed application on the system.`
+	case WU_E_MISSING_HANDLER:
+		return `A component required to detect applicable updates was missing.`
+	case WU_E_LEGACYSERVER:
+		return `An operation did not complete because it requires a newer version of server.`
+	case WU_E_BIN_SOURCE_ABSENT:
+		return `A delta-compressed update could not be installed because it required the source.`
+	case WU_E_SOURCE_ABSENT:
+		return `A full-file update could not be installed because it required the source.`
+	case WU_E_WU_DISABLED:
+		return `Access to an unmanaged server is not allowed.`
+	case WU_E_CALL_CANCELLED_BY_POLICY:
+		return `Operation did not complete because the DisableWindowsUpdateAccess policy was set in the registry.`
+	case WU_E_INVALID_PROXY_SERVER:
+		return `The format of the proxy list was invalid.`
+	case WU_E_INVALID_FILE:
+		return `The file is in the wrong format.`
+	case WU_E_INVALID_CRITERIA:
+		return `The search criteria string was invalid.`
+	case WU_E_EULA_UNAVAILABLE:
+		return `License terms could not be downloaded.`
+	case WU_E_DOWNLOAD_FAILED:
+		return `Update failed to download.`
+	case WU_E_UPDATE_NOT_PROCESSED:
+		return `The update was not processed.`
+	case WU_E_INVALID_OPERATION:
+		return `The object's current state did not allow the operation.`
+	case WU_E_NOT_SUPPORTED:
+		return `The functionality for the operation is not supported.`
+	case WU_E_TOO_MANY_RESYNC:
+		return `Agent is asked by server to resync too many times.`
+	case WU_E_NO_SERVER_CORE_SUPPORT:
+		return `The WUA API method does not run on the server core installation.`
+	case WU_E_SYSPREP_IN_PROGRESS:
+		return `Service is not available while sysprep is running.`
+	case WU_E_UNKNOWN_SERVICE:
+		return `The update service is no longer registered with automatic updates.`
+	case WU_E_NO_UI_SUPPORT:
+		return `No support for the WUA user interface.`
+	case WU_E_PER_MACHINE_UPDATE_ACCESS_DENIED:
+		return `Only administrators can perform this operation on per-computer updates.`
+	case WU_E_UNSUPPORTED_SEARCHSCOPE:
+		return `A search was attempted with a scope that is not currently supported for this type of search.`
+	case WU_E_BAD_FILE_URL:
+		return `The URL does not point to a file.`
+	case WU_E_NOTSUPPORTED:
+		return `The operation requested is not supported.`
+	case WU_E_INVALID_NOTIFICATION_INFO:
+		return `The featured update notification info returned by the server is invalid.`
+	case WU_E_OUTOFRANGE:
+		return `The data is out of range.`
+	case WU_E_SETUP_IN_PROGRESS:
+		return `WUA operations are not available while operating system setup is running.`
+	case WU_E_UNEXPECTED:
+		return `An operation failed due to reasons not covered by another error code.`
+	case WU_E_WINHTTP_INVALID_FILE:
+		return `The downloaded file has an unexpected content type.`
+	case WU_E_PT_HTTP_STATUS_BAD_REQUEST:
+		return `Same as HTTP status 400 – The server could not process the request due to invalid syntax.`
+	case WU_E_PT_HTTP_STATUS_DENIED:
+		return `Same as HTTP status 401 – The requested resource requires user authentication.`
+	case WU_E_PT_HTTP_STATUS_FORBIDDEN:
+		return `Same as HTTP status 403 – Server understood the request, but declines to fulfill it.`
+	case WU_E_PT_HTTP_STATUS_NOT_FOUND:
+		return `Same as HTTP status 404 – The server cannot find the requested URI (Uniform Resource Identifier).`
+	case WU_E_PT_HTTP_STATUS_BAD_METHOD:
+		return `Same as HTTP status 405 – The HTTP method is not allowed.`
+	case WU_E_PT_HTTP_STATUS_PROXY_AUTH_REQ:
+		return `Same as HTTP status 407 – Proxy authentication is required.`
+	case WU_E_PT_HTTP_STATUS_REQUEST_TIMEOUT:
+		return `Same as HTTP status 408 – The server timed out waiting for the request.`
+	case WU_E_PT_HTTP_STATUS_CONFLICT:
+		return `Same as HTTP status 409 – The request was not completed due to a conflict with the current state of the resource.`
+	case WU_E_PT_HTTP_STATUS_GONE:
+		return `Same as HTTP status 410 – Requested resource is no longer available at the server.`
+	case WU_E_PT_HTTP_STATUS_SERVER_ERROR:
+		return `Same as HTTP status 500 – An error internal to the server prevented fulfilling the request.`
+	case WU_E_PT_HTTP_STATUS_NOT_SUPPORTED:
+		return `Same as HTTP status 501 – Server does not support the functionality required to fulfill the request.`
+	case WU_E_PT_HTTP_STATUS_BAD_GATEWAY:
+		return `Same as HTTP status 502 – The server, while acting as a gateway or proxy, received an invalid response from the upstream server it accessed in attempting to fulfill the request.`
+	case WU_E_PT_HTTP_STATUS_SERVICE_UNAVAIL:
+		return `Same as HTTP status 503 – The service is temporarily overloaded.`
+	case WU_E_PT_HTTP_STATUS_GATEWAY_TIMEOUT:
+		return `Same as HTTP status 504 – The request was timed out waiting for a gateway.`
+	case WU_E_PT_HTTP_STATUS_VERSION_NOT_SUP:
+		return `Same as HTTP status 505 – The server does not support the HTTP protocol version used for the request.`
+	case WU_E_PT_HTTP_STATUS_NOT_MAPPED:
+		return `The request could not be completed and the reason did not correspond to any of the WU_E_PT_HTTP_* error codes.`
+	case WU_E_PT_WINHTTP_NAME_NOT_RESOLVED:
+		return `Same as ERROR_WINHTTP_NAME_NOT_RESOLVED - The proxy server or target server name cannot be resolved.`
+	default:
+		return `Unknown error.`
+	}
+}
+
+func ErrorName(errCode WUError) string {
+	switch errCode {
+	case WU_S_SERVICE_STOP:
+		return `WU_S_SERVICE_STOP`
+	case WU_S_SELFUPDATE:
+		return `WU_S_SELFUPDATE`
+	case WU_S_UPDATE_ERROR:
+		return `WU_S_UPDATE_ERROR`
+	case WU_S_MARKED_FOR_DISCONNECT:
+		return `WU_S_MARKED_FOR_DISCONNECT`
+	case WU_S_REBOOT_REQUIRED:
+		return `WU_S_REBOOT_REQUIRED`
+	case WU_S_ALREADY_INSTALLED:
+		return `WU_S_ALREADY_INSTALLED`
+	case WU_S_ALREADY_UNINSTALLED:
+		return `WU_S_ALREADY_UNINSTALLED`
+	case WU_S_ALREADY_DOWNLOADED:
+		return `WU_S_ALREADY_DOWNLOADED`
+	case WU_S_UH_INSTALLSTILLPENDING:
+		return `WU_S_UH_INSTALLSTILLPENDING`
+	case WU_E_NO_SERVICE:
+		return `WU_E_NO_SERVICE`
+	case WU_E_MAX_CAPACITY_REACHED:
+		return `WU_E_MAX_CAPACITY_REACHED`
+	case WU_E_UNKNOWN_ID:
+		return `WU_E_UNKNOWN_ID`
+	case WU_E_NOT_INITIALIZED:
+		return `WU_E_NOT_INITIALIZED`
+	case WU_E_RANGEOVERLAP:
+		return `WU_E_RANGEOVERLAP`
+	case WU_E_TOOMANYRANGES:
+		return `WU_E_TOOMANYRANGES`
+	case WU_E_INVALIDINDEX:
+		return `WU_E_INVALIDINDEX`
+	case WU_E_ITEMNOTFOUND:
+		return `WU_E_ITEMNOTFOUND`
+	case WU_E_OPERATIONINPROGRESS:
+		return `WU_E_OPERATIONINPROGRESS`
+	case WU_E_COULDNOTCANCEL:
+		return `WU_E_COULDNOTCANCEL`
+	case WU_E_CALL_CANCELLED:
+		return `WU_E_CALL_CANCELLED`
+	case WU_E_NOOP:
+		return `WU_E_NOOP`
+	case WU_E_XML_MISSINGDATA:
+		return `WU_E_XML_MISSINGDATA`
+	case WU_E_XML_INVALID:
+		return `WU_E_XML_INVALID`
+	case WU_E_CYCLE_DETECTED:
+		return `WU_E_CYCLE_DETECTED`
+	case WU_E_TOO_DEEP_RELATION:
+		return `WU_E_TOO_DEEP_RELATION`
+	case WU_E_INVALID_RELATIONSHIP:
+		return `WU_E_INVALID_RELATIONSHIP`
+	case WU_E_REG_VALUE_INVALID:
+		return `WU_E_REG_VALUE_INVALID`
+	case WU_E_DUPLICATE_ITEM:
+		return `WU_E_DUPLICATE_ITEM`
+	case WU_E_INVALID_INSTALL_REQUESTED:
+		return `WU_E_INVALID_INSTALL_REQUESTED`
+	case WU_E_INSTALL_NOT_ALLOWED:
+		return `WU_E_INSTALL_NOT_ALLOWED`
+	case WU_E_NOT_APPLICABLE:
+		return `WU_E_NOT_APPLICABLE`
+	case WU_E_NO_USERTOKEN:
+		return `WU_E_NO_USERTOKEN`
+	case WU_E_EXCLUSIVE_INSTALL_CONFLICT:
+		return `WU_E_EXCLUSIVE_INSTALL_CONFLICT`
+	case WU_E_POLICY_NOT_SET:
+		return `WU_E_POLICY_NOT_SET`
+	case WU_E_SELFUPDATE_IN_PROGRESS:
+		return `WU_E_SELFUPDATE_IN_PROGRESS`
+	case WU_E_INVALID_UPDATE:
+		return `WU_E_INVALID_UPDATE`
+	case WU_E_SERVICE_STOP:
+		return `WU_E_SERVICE_STOP`
+	case WU_E_NO_CONNECTION:
+		return `WU_E_NO_CONNECTION`
+	case WU_E_NO_INTERACTIVE_USER:
+		return `WU_E_NO_INTERACTIVE_USER`
+	case WU_E_TIME_OUT:
+		return `WU_E_TIME_OUT`
+	case WU_E_ALL_UPDATES_FAILED:
+		return `WU_E_ALL_UPDATES_FAILED`
+	case WU_E_EULAS_DECLINED:
+		return `WU_E_EULAS_DECLINED`
+	case WU_E_NO_UPDATE:
+		return `WU_E_NO_UPDATE`
+	case WU_E_USER_ACCESS_DISABLED:
+		return `WU_E_USER_ACCESS_DISABLED`
+	case WU_E_INVALID_UPDATE_TYPE:
+		return `WU_E_INVALID_UPDATE_TYPE`
+	case WU_E_URL_TOO_LONG:
+		return `WU_E_URL_TOO_LONG`
+	case WU_E_UNINSTALL_NOT_ALLOWED:
+		return `WU_E_UNINSTALL_NOT_ALLOWED`
+	case WU_E_INVALID_PRODUCT_LICENSE:
+		return `WU_E_INVALID_PRODUCT_LICENSE`
+	case WU_E_MISSING_HANDLER:
+		return `WU_E_MISSING_HANDLER`
+	case WU_E_LEGACYSERVER:
+		return `WU_E_LEGACYSERVER`
+	case WU_E_BIN_SOURCE_ABSENT:
+		return `WU_E_BIN_SOURCE_ABSENT`
+	case WU_E_SOURCE_ABSENT:
+		return `WU_E_SOURCE_ABSENT`
+	case WU_E_WU_DISABLED:
+		return `WU_E_WU_DISABLED`
+	case WU_E_CALL_CANCELLED_BY_POLICY:
+		return `WU_E_CALL_CANCELLED_BY_POLICY`
+	case WU_E_INVALID_PROXY_SERVER:
+		return `WU_E_INVALID_PROXY_SERVER`
+	case WU_E_INVALID_FILE:
+		return `WU_E_INVALID_FILE`
+	case WU_E_INVALID_CRITERIA:
+		return `WU_E_INVALID_CRITERIA`
+	case WU_E_EULA_UNAVAILABLE:
+		return `WU_E_EULA_UNAVAILABLE`
+	case WU_E_DOWNLOAD_FAILED:
+		return `WU_E_DOWNLOAD_FAILED`
+	case WU_E_UPDATE_NOT_PROCESSED:
+		return `WU_E_UPDATE_NOT_PROCESSED`
+	case WU_E_INVALID_OPERATION:
+		return `WU_E_INVALID_OPERATION`
+	case WU_E_NOT_SUPPORTED:
+		return `WU_E_NOT_SUPPORTED`
+	case WU_E_TOO_MANY_RESYNC:
+		return `WU_E_TOO_MANY_RESYNC`
+	case WU_E_NO_SERVER_CORE_SUPPORT:
+		return `WU_E_NO_SERVER_CORE_SUPPORT`
+	case WU_E_SYSPREP_IN_PROGRESS:
+		return `WU_E_SYSPREP_IN_PROGRESS`
+	case WU_E_UNKNOWN_SERVICE:
+		return `WU_E_UNKNOWN_SERVICE`
+	case WU_E_NO_UI_SUPPORT:
+		return `WU_E_NO_UI_SUPPORT`
+	case WU_E_PER_MACHINE_UPDATE_ACCESS_DENIED:
+		return `WU_E_PER_MACHINE_UPDATE_ACCESS_DENIED`
+	case WU_E_UNSUPPORTED_SEARCHSCOPE:
+		return `WU_E_UNSUPPORTED_SEARCHSCOPE`
+	case WU_E_BAD_FILE_URL:
+		return `WU_E_BAD_FILE_URL`
+	case WU_E_NOTSUPPORTED:
+		return `WU_E_NOTSUPPORTED`
+	case WU_E_INVALID_NOTIFICATION_INFO:
+		return `WU_E_INVALID_NOTIFICATION_INFO`
+	case WU_E_OUTOFRANGE:
+		return `WU_E_OUTOFRANGE`
+	case WU_E_SETUP_IN_PROGRESS:
+		return `WU_E_SETUP_IN_PROGRESS`
+	case WU_E_UNEXPECTED:
+		return `WU_E_UNEXPECTED`
+	case WU_E_WINHTTP_INVALID_FILE:
+		return `WU_E_WINHTTP_INVALID_FILE`
+	case WU_E_PT_HTTP_STATUS_BAD_REQUEST:
+		return `WU_E_PT_HTTP_STATUS_BAD_REQUEST`
+	case WU_E_PT_HTTP_STATUS_DENIED:
+		return `WU_E_PT_HTTP_STATUS_DENIED`
+	case WU_E_PT_HTTP_STATUS_FORBIDDEN:
+		return `WU_E_PT_HTTP_STATUS_FORBIDDEN`
+	case WU_E_PT_HTTP_STATUS_NOT_FOUND:
+		return `WU_E_PT_HTTP_STATUS_NOT_FOUND`
+	case WU_E_PT_HTTP_STATUS_BAD_METHOD:
+		return `WU_E_PT_HTTP_STATUS_BAD_METHOD`
+	case WU_E_PT_HTTP_STATUS_PROXY_AUTH_REQ:
+		return `WU_E_PT_HTTP_STATUS_PROXY_AUTH_REQ`
+	case WU_E_PT_HTTP_STATUS_REQUEST_TIMEOUT:
+		return `WU_E_PT_HTTP_STATUS_REQUEST_TIMEOUT`
+	case WU_E_PT_HTTP_STATUS_CONFLICT:
+		return `WU_E_PT_HTTP_STATUS_CONFLICT`
+	case WU_E_PT_HTTP_STATUS_GONE:
+		return `WU_E_PT_HTTP_STATUS_GONE`
+	case WU_E_PT_HTTP_STATUS_SERVER_ERROR:
+		return `WU_E_PT_HTTP_STATUS_SERVER_ERROR`
+	case WU_E_PT_HTTP_STATUS_NOT_SUPPORTED:
+		return `WU_E_PT_HTTP_STATUS_NOT_SUPPORTED`
+	case WU_E_PT_HTTP_STATUS_BAD_GATEWAY:
+		return `WU_E_PT_HTTP_STATUS_BAD_GATEWAY`
+	case WU_E_PT_HTTP_STATUS_SERVICE_UNAVAIL:
+		return `WU_E_PT_HTTP_STATUS_SERVICE_UNAVAIL`
+	case WU_E_PT_HTTP_STATUS_GATEWAY_TIMEOUT:
+		return `WU_E_PT_HTTP_STATUS_GATEWAY_TIMEOUT`
+	case WU_E_PT_HTTP_STATUS_VERSION_NOT_SUP:
+		return `WU_E_PT_HTTP_STATUS_VERSION_NOT_SUP`
+	case WU_E_PT_HTTP_STATUS_NOT_MAPPED:
+		return `WU_E_PT_HTTP_STATUS_NOT_MAPPED`
+	case WU_E_PT_WINHTTP_NAME_NOT_RESOLVED:
+		return `WU_E_PT_WINHTTP_NAME_NOT_RESOLVED`
+	default:
+		return ``
+	}
+}
+
+func (wue WUError) String() string {
+	return "[" + ErrorName(wue) + "] " + ErrorDesc(wue)
+}
 
 // REFERENCES:
 // http://msdn.microsoft.com/en-us/library/windows/desktop/hh968413(v=vs.85).aspx (success/error codes)
