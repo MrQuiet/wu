@@ -12,6 +12,10 @@ func main() {
 	fmt.Printf("Updates: %d\n", len(updates.Updates))
 	for _, update := range updates.Updates {
 		fmt.Printf("[%s] %s\n", update.Type, update.Title)
+		if !update.EulaAccepted {
+			code, err := update.AcceptEula()
+			fmt.Printf("ACCEPTEULA: [%s] [%s]\n", code, err)
+		}
 	}
 	downloader := ses.NewDownloader(updates)
 	code, err := downloader.Download()

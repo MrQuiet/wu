@@ -133,8 +133,13 @@ func newUpdate(item *ole.IDispatch) *Update {
 	return up
 }
 
-func (up *Update) AcceptEula(accept bool) {
-	oleutil.MustCallMethod(up.item, "AcceptEula", accept)
+func (up *Update) AcceptEula() (WUError, error) {
+	ret, err := oleutil.CallMethod(up.item, "AcceptEula")
+	if err == nil {
+		up.EulaAccepted = true
+	}
+	val := WUError(ret.Val)
+	return val, err
 }
 
 func (up *Update) GetString(attr string) string {

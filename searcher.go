@@ -21,6 +21,7 @@ func (sea *Searcher) Query(query string) *Updates {
 	updatesSet := new(Updates)
 	updates := oleutil.MustGetProperty(queryResult, "Updates").ToIDispatch()
 	count := int(oleutil.MustGetProperty(updates, "Count").Val)
+	updatesSet.updates = updates
 	updatesSet.Updates = make([]*Update, count)
 	for i := 0; i < count; i++ {
 		item := oleutil.MustGetProperty(updates, "Item", i).ToIDispatch()
